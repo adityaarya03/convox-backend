@@ -12,7 +12,7 @@ export const generateScript = (req, res) => {
     fontFamily,
   }).toString();
 
-  const widgetURL = `https://your-static-host.com/chat-widget.html?${encodedParams}`;
+  const widgetURL = `https://convo-x-signup.vercel.app/chat-widget?${encodedParams}`;
 
   const scriptTag = `
 <script>
