@@ -234,9 +234,9 @@ export const widgetScript = (req, res) => {
 
   <script>
   const userId = "${user_id}";
-  const primaryColor = "${primaryColor || "#0675E6"}";
-  const secondaryColor = "${secondaryColor || "#e6f0ff"}";
-  const fontFamily = "${fontFamily || "Inter, sans-serif"}";
+  const primaryColor = "${sanitizedPrimary}";
+  const secondaryColor = "${sanitizedSecondary}";
+  const fontFamily = "${sanitizedFont}";
 
   const sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
 
