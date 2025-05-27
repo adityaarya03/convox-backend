@@ -28,7 +28,7 @@ export const generateScript = (req, res) => {
 };
 
 export const widgetScript = (req, res) => {
-  const { user_id, primaryColor, secondaryColor, fontFamily } = req.body;
+  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth } = req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
   // const iframeUrl = `https://convo-x-signup.vercel.app/chat-widget?user_id=${user_id}&primaryColor=${primaryColor}&secondaryColor=${secondaryColor}&fontFamily=${fontFamily}`;
@@ -37,6 +37,7 @@ export const widgetScript = (req, res) => {
   const sanitizedPrimary = (primaryColor || "").trim() || "#0675E6";
   const sanitizedSecondary = (secondaryColor || "").trim() || "#e6f0ff";
   const sanitizedFont = (fontFamily || "").trim() || "Poppins, sans-serif";
+  const sanitizedWidth = (widgetWidth || "").trim() || "350px";
 
   res.setHeader("Content-Type", "text/html");
   res.send(`
@@ -51,6 +52,7 @@ export const widgetScript = (req, res) => {
       --primary-color: ${sanitizedPrimary};
       --secondary-color:  ${sanitizedSecondary};
       --font-family:  ${sanitizedFont};
+      --widget-width: ${sanitizedWidth};
     }
 
     body {
@@ -80,7 +82,7 @@ export const widgetScript = (req, res) => {
       position: fixed;
       bottom: 90px;
       right: 20px;
-      width: 350px;
+      width: var(--widget-width);
       max-width: 90%;
       height: 450px;
       background-color: white;
