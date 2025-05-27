@@ -31,7 +31,7 @@ export const widgetScript = (req, res) => {
   const { user_id, primaryColor, secondaryColor, fontFamily } = req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
-  const iframeUrl = `https://convo-x-signup.vercel.app/chat-widget?user_id=${user_id}&primaryColor=${primaryColor}&secondaryColor=${secondaryColor}&fontFamily=${fontFamily}`;
+  // const iframeUrl = `https://convo-x-signup.vercel.app/chat-widget?user_id=${user_id}&primaryColor=${primaryColor}&secondaryColor=${secondaryColor}&fontFamily=${fontFamily}`;
 
   res.setHeader("Content-Type", "text/html");
   res.send(`
@@ -43,9 +43,9 @@ export const widgetScript = (req, res) => {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <style>
     :root {
-      --primary-color: #0675E6;
-      --secondary-color: #e6f0ff;
-      --font-family: Inter, sans-serif;
+      --primary-color: ${primaryColor || "#0675E6"};
+      --secondary-color:  ${secondaryColor || "#e6f0ff"};
+      --font-family:  ${fontFamily || "Inter, sans-serif"};
     }
 
     body {
