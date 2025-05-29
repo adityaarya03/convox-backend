@@ -32,6 +32,7 @@ export const widgetScript = (req, res) => {
     req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
+  console.log(req.body);
   // const iframeUrl = `https://convo-x-signup.vercel.app/chat-widget?user_id=${user_id}&primaryColor=${primaryColor}&secondaryColor=${secondaryColor}&fontFamily=${fontFamily}`;
 
   const sanitizedPrimary = (primaryColor || "").trim() || "#0675E6";
