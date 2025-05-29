@@ -28,7 +28,7 @@ export const generateScript = (req, res) => {
 };
 
 export const widgetScript = (req, res) => {
-  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth } =
+  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth, companionName } =
     req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
@@ -107,7 +107,7 @@ export const widgetScript = (req, res) => {
         style="background-color: ${sanitizedPrimary}"
       >
         <div>
-          <h1>Companion</h1>
+          <h1>${companionName}</h1>
           <p class="text-xs text-100">Powered By ConvoX</p>
         </div>
       </div>
