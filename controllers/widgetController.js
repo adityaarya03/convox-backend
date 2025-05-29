@@ -43,280 +43,215 @@ export const widgetScript = (req, res) => {
   res.send(`
     <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>ConvoX Chat</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <style>
-    :root {
-      --primary-color: ${sanitizedPrimary};
-      --secondary-color:  ${sanitizedSecondary};
-      --font-family:  ${sanitizedFont};
-      --widget-width: ${sanitizedWidth};
-    }
-
-    body {
-      margin: 0;
-      font-family: var(--font-family);
-    }
-
-    .chat-toggle {
-      position: fixed;
-      bottom: 20px;
-      right: 20px;
-      width: 60px;
-      height: 60px;
-      background-color: var(--primary-color);
-      border-radius: 50%;
-      color: white;
-      font-size: 28px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-      z-index: 999;
-    }
-
-    .chat-box {
-      position: fixed;
-      bottom: 90px;
-      right: 20px;
-      width: var(--widget-width);
-      max-width: 90%;
-      height: 450px;
-      background-color: white;
-      border: 2px solid var(--primary-color);
-      border-radius: 24px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
-      z-index: 998;
-    }
-
-    .chat-header {
-      height: 48px;
-      background-color: var(--primary-color);
-    }
-
-    .chat-messages {
-      flex: 1;
-      overflow-y: auto;
-      padding: 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-    }
-
-    .chat-message {
-      max-width: 80%;
-      padding: 8px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-      line-height: 1.4;
-    }
-
-    .chat-message.user {
-      align-self: flex-end;
-      background-color: var(--primary-color);
-      color: white;
-    }
-
-    .chat-message.bot {
-      font-family: var(--font-family);
-      align-self: flex-start;
-      background-color: #f0f0f0;
-      color: black;
-    }
-
-    .chat-input-area {
-      display: flex;
-      gap: 8px;
-      padding: 10px;
-      background-color: var(--secondary-color);
-      border-top: 1px solid #ddd;
-    }
-
-    .chat-input {
-      flex: 1;
-      padding: 8px 12px;
-      font-size: 14px;
-      border-radius: 9999px;
-      border: 1px solid #ccc;
-    }
-
-    .chat-send {
-      width: 40px;
-      height: 40px;
-      background-color: var(--primary-color);
-      border: none;
-      border-radius: 50%;
-      color: white;
-      font-size: 18px;
-      cursor: pointer;
-    }
-
-    .chat-typing {
-      align-self: flex-start;
-      background-color: #f0f0f0;
-      padding: 6px 10px;
-      border-radius: 16px;
-      font-size: 13px;
-      animation: pulse 1s infinite;
-    }
-
-    @keyframes pulse {
-      0% { opacity: 0.6; }
-      50% { opacity: 1; }
-      100% { opacity: 0.6; }
-    }
-  </style>
-</head>
-<body>
-  <div class="chat-toggle" onclick="toggleChat()">
-    <svg
-        width="44px"
-        height="44px"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        stroke="#ffffff"
-        stroke-width="0.00024000000000000003"
-      >
-        <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
-        <g
-          id="SVGRepo_tracerCarrier"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        ></g>
-        <g id="SVGRepo_iconCarrier">
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M7.5 11C6.94772 11 6.5 11.4477 6.5 12C6.5 12.5523 6.94772 13 7.5 13C8.05228 13 8.5 12.5523 8.5 12C8.5 11.4477 8.05228 11 7.5 11ZM5.5 12C5.5 10.8954 6.39543 10 7.5 10C8.60457 10 9.5 10.8954 9.5 12C9.5 13.1046 8.60457 14 7.5 14C6.39543 14 5.5 13.1046 5.5 12Z"
-            fill="#ffffff"
-          ></path>
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M16.5 11C15.9477 11 15.5 11.4477 15.5 12C15.5 12.5523 15.9477 13 16.5 13C17.0523 13 17.5 12.5523 17.5 12C17.5 11.4477 17.0523 11 16.5 11ZM14.5 12C14.5 10.8954 15.3954 10 16.5 10C17.6046 10 18.5 10.8954 18.5 12C18.5 13.1046 17.6046 14 16.5 14C15.3954 14 14.5 13.1046 14.5 12Z"
-            fill="#ffffff"
-          ></path>
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M10 15.5C10.2761 15.5 10.5 15.7239 10.5 16L10.5003 16.0027C10.5003 16.0027 10.5014 16.0073 10.5034 16.0122C10.5074 16.022 10.5171 16.0405 10.5389 16.0663C10.5845 16.1202 10.6701 16.1902 10.8094 16.2599C11.0883 16.3993 11.5085 16.5 12 16.5C12.4915 16.5 12.9117 16.3993 13.1906 16.2599C13.3299 16.1902 13.4155 16.1202 13.4611 16.0663C13.4829 16.0405 13.4926 16.022 13.4966 16.0122C13.4986 16.0073 13.4997 16.0027 13.4997 16.0027L13.5 16C13.5 15.7239 13.7239 15.5 14 15.5C14.2761 15.5 14.5 15.7239 14.5 16C14.5 16.5676 14.0529 16.9468 13.6378 17.1543C13.1928 17.3768 12.6131 17.5 12 17.5C11.3869 17.5 10.8072 17.3768 10.3622 17.1543C9.9471 16.9468 9.5 16.5676 9.5 16C9.5 15.7239 9.72386 15.5 10 15.5Z"
-            fill="#ffffff"
-          ></path>
-          <path
-            fill-rule="evenodd"
-            clip-rule="evenodd"
-            d="M16 5.5V7.5H8V5.5C8 5.22386 7.77614 5 7.5 5C7.22386 5 7 5.22386 7 5.5V7.5H6C4.61929 7.5 3.5 8.61929 3.5 10V17C3.5 18.3807 4.61929 19.5 6 19.5H18C19.3807 19.5 20.5 18.3807 20.5 17V10C20.5 8.61929 19.3807 7.5 18 7.5H17V5.5C17 5.22386 16.7761 5 16.5 5C16.2239 5 16 5.22386 16 5.5ZM6 8.5C5.17157 8.5 4.5 9.17157 4.5 10V17C4.5 17.8284 5.17157 18.5 6 18.5H18C18.8284 18.5 19.5 17.8284 19.5 17V10C19.5 9.17157 18.8284 8.5 18 8.5H6Z"
-            fill="#ffffff"
-          ></path>
-        </g>
-      </svg>
-  </div>
-
-  <div class="chat-box" id="chatBox" style="display: none;">
-    <div class="chat-header"></div>
-    <div class="chat-messages" id="chatMessages"></div>
-    <div class="chat-input-area">
-      <input
-        type="text"
-        id="chatInput"
-        placeholder="Type your message..."
-        class="chat-input"
-        onkeydown="if(event.key === 'Enter') sendMessage()"
-      />
-      <button class="chat-send" onclick="sendMessage()">➤</button>
-    </div>
-  </div>
-
-  <script>
-  const userId = "${user_id}";
-  const primaryColor = "${sanitizedPrimary}";
-  const secondaryColor = "${sanitizedSecondary}";
-  const fontFamily = "${sanitizedFont}";
-
-  const sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
-
-  if (!userId) {
-    document.body.innerHTML = '<h3 style="font-family:' + fontFamily + '; color:red; text-align:center; margin-top:2rem;">Error: Missing user_id</h3>';
-  }
-
-  // Apply dynamic styles
-  document.documentElement.style.setProperty("--primary-color", primaryColor);
-  document.documentElement.style.setProperty("--secondary-color", secondaryColor);
-  document.documentElement.style.setProperty("--font-family", fontFamily);
-
-    function toggleChat() {
-      const chat = document.getElementById("chatBox");
-      chat.style.display = chat.style.display === "none" ? "flex" : "none";
-    }
-
-    function appendMessage(from, text) {
-      const msgDiv = document.createElement("div");
-      msgDiv.className = "chat-message " + from;
-      msgDiv.textContent = text;
-      document.getElementById("chatMessages").appendChild(msgDiv);
-      document.getElementById("chatMessages").scrollTop = document.getElementById("chatMessages").scrollHeight;
-    }
-
-    function showTyping() {
-      const typingDiv = document.createElement("div");
-      typingDiv.className = "chat-typing";
-      typingDiv.id = "typing-indicator";
-      typingDiv.textContent = "typing...";
-      document.getElementById("chatMessages").appendChild(typingDiv);
-    }
-
-    function hideTyping() {
-      const typingDiv = document.getElementById("typing-indicator");
-      if (typingDiv) typingDiv.remove();
-    }
-
-    async function sendMessage() {
-      const input = document.getElementById("chatInput");
-      const message = input.value.trim();
-      if (!message) return;
-
-      appendMessage("user", message);
-      input.value = "";
-      showTyping();
-
-      try {
-        const res = await fetch("https://walrus.kalavishva.com/webhook/convox_trial", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            user_id: userId,
-            session_id: sessionId,
-            timestamp: new Date().toLocaleString("en-GB"),
-            user_message: message,
-          }),
-        });
-
-        const data = await res.json();
-        hideTyping();
-
-        const botReply = Array.isArray(data) && data.length > 0
-          ? data[data.length - 1].response
-          : "Sorry, something went wrong.";
-
-        appendMessage("bot", botReply);
-      } catch (err) {
-        hideTyping();
-        appendMessage("bot", "Error contacting server.");
-        console.error(err);
+  <head>
+    <meta charset="UTF-8" />
+    <title>ConvoX Chat</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      #chatBox {
+        transition: all 0.3s ease;
+        transform: scale(0.95);
+        opacity: 0;
+        pointer-events: none;
       }
-    }
-  </script>
-</body>
-</html>
+      #chatBox.open {
+        transform: scale(1);
+        opacity: 1;
+        pointer-events: auto;
+      }
+      textarea::-webkit-scrollbar {
+        width: 6px;
+      }
+      textarea {
+        resize: none;
+        overflow-y: auto;
+        max-height: 80px;
+      }
+    </style>
+  </head>
+  <body class="m-0" style="font-family: ${sanitizedFont}">
+    <!-- Chat Toggle Button -->
+    <div
+      id="chatToggleBtn"
+      class="fixed bottom-5 right-5 w-[60px] h-[60px] rounded-full text-white text-2xl flex items-center justify-center shadow-lg z-[999] cursor-pointer"
+      style="background-color: ${sanitizedPrimary}"
+      onclick="toggleChat()"
+    >
+      <svg
+        id="chatIcon"
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        height="24"
+        viewBox="0 0 24 24"
+        width="24"
+      >
+        <path fill="#ffffff" d="M8 7H16V9H8V7Z" />
+        <path fill="#ffffff" d="M14 11H8V13H14V11Z" />
+        <path
+          fill="#ffffff"
+          d="M19.2 3C20.19 3 20.99 3.81 20.99 4.8L21 21L17.4 17.4H4.8C3.81 17.4 3 16.59 3 15.6V4.8C3 3.81 3.81 3 4.8 3H19.2Z"
+        />
+      </svg>
+    </div>
 
+    <!-- Chat Box -->
+    <div
+      id="chatBox"
+      class="fixed bottom-[90px] right-3 w-[90%] sm:w-[370px] h-[70vh] rounded-2xl overflow-hidden bg-white flex flex-col shadow-lg z-[998]"
+    >
+      <div
+        class="h-16 text-white flex flex-col justify-center px-6"
+        style="background-color: ${sanitizedPrimary}"
+      >
+        <div>
+          <h1>Companion</h1>
+          <p class="text-xs text-100">Powered By ConvoX</p>
+        </div>
+      </div>
+
+      <div
+        id="chatMessages"
+        class="flex-1 overflow-y-auto p-3 flex flex-col gap-2"
+      ></div>
+
+      <div
+        class="flex gap-2 items-center p-2 bg-white border-t border-gray-300"
+      >
+        <textarea
+          id="chatInput"
+          placeholder="How can we help you today..."
+          rows="1"
+          class="flex-1 px-3 py-2 text-sm focus:outline-none resize-none overflow-y-auto"
+          oninput="adjustHeight(this)"
+          onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); sendMessage(); }"
+        ></textarea>
+        <button
+          onclick="sendMessage()"
+          class="w-10 h-10 text-white text-lg rounded-full flex items-center justify-center"
+          style="background-color: ${sanitizedPrimary}"
+        >
+          <svg
+            width="19px"
+            height="19px"
+            viewBox="0 0 24 24"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M11.5003 12H5.41872M5.24634 12.7972L4.24158 15.7986C3.69128 17.4424 3.41613 18.2643 3.61359 18.7704C3.78506 19.21 4.15335 19.5432 4.6078 19.6701C5.13111 19.8161 5.92151 19.4604 7.50231 18.7491L17.6367 14.1886C19.1797 13.4942 19.9512 13.1471 20.1896 12.6648C20.3968 12.2458 20.3968 11.7541 20.1896 11.3351C19.9512 10.8529 19.1797 10.5057 17.6367 9.81135L7.48483 5.24303C5.90879 4.53382 5.12078 4.17921 4.59799 4.32468C4.14397 4.45101 3.77572 4.78336 3.60365 5.22209C3.40551 5.72728 3.67772 6.54741 4.22215 8.18767L5.24829 11.2793C5.34179 11.561 5.38855 11.7019 5.407 11.8459C5.42338 11.9738 5.42321 12.1032 5.40651 12.231C5.38768 12.375 5.34057 12.5157 5.24634 12.7972Z"
+              stroke="#ffffff"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            ></path>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <script>
+      const userId = "${user_id}";
+      const primaryColor = "${sanitizedPrimary}";
+      const secondaryColor = "${sanitizedSecondary}";
+      const fontFamily = "${sanitizedFont}";
+      const sessionId = "sess_" + Math.random().toString(36).substring(2, 10);
+      const chatBox = document.getElementById("chatBox");
+      const chatIcon = document.getElementById("chatIcon");
+      let isChatOpen = false;
+
+      if (!userId) {
+        document.body.innerHTML =
+          '<h3 class="text-red-500 text-center mt-8">Error: Missing user_id</h3>';
+      }
+
+      function toggleChat() {
+        isChatOpen = !isChatOpen;
+        chatBox.classList.toggle("open");
+
+        chatIcon.innerHTML = isChatOpen
+          ? \`<path stroke="#fff" stroke-width="2" d="M6 6L18 18M6 18L18 6" />\`
+          : \`<path fill="#ffffff" d="M8 7H16V9H8V7Z"/><path fill="#ffffff" d="M14 11H8V13H14V11Z"/><path fill="#ffffff" d="M19.2 3C20.19 3 20.99 3.81 20.99 4.8L21 21L17.4 17.4H4.8C3.81 17.4 3 16.59 3 15.6V4.8C3 3.81 3.81 3 4.8 3H19.2Z"/>\`;
+      }
+
+      function adjustHeight(el) {
+        el.style.height = "auto";
+        el.style.height = (el.scrollHeight < 80 ? el.scrollHeight : 80) + "px";
+      }
+
+      function appendMessage(from, text) {
+        const msgDiv = document.createElement("div");
+        msgDiv.className = \` chat-message \${
+          from === "user"
+            ? "self-end text-white"
+            : "self-start bg-gray-100 text-black"
+        } max-w-[80%] px-3 py-2 rounded-2xl text-sm leading-relaxed \`;
+        msgDiv.textContent = text;
+        if (from === "user") {
+          msgDiv.style.backgroundColor = primaryColor;
+        }
+        document.getElementById("chatMessages").appendChild(msgDiv);
+        document.getElementById("chatMessages").scrollTop =
+          document.getElementById("chatMessages").scrollHeight;
+      }
+
+      function showTyping() {
+        const typingDiv = document.createElement("div");
+        typingDiv.className =
+          "self-start bg-gray-100 px-3 py-1.5 rounded-xl text-xs animate-pulse";
+        typingDiv.id = "typing-indicator";
+        typingDiv.textContent = "typing...";
+        document.getElementById("chatMessages").appendChild(typingDiv);
+      }
+
+      function hideTyping() {
+        const typingDiv = document.getElementById("typing-indicator");
+        if (typingDiv) typingDiv.remove();
+      }
+
+      async function sendMessage() {
+        const input = document.getElementById("chatInput");
+        const message = input.value.trim();
+        if (!message) return;
+
+        appendMessage("user", message);
+        input.value = "";
+        adjustHeight(input);
+        showTyping();
+
+        try {
+          const res = await fetch(
+            "https://walrus.kalavishva.com/webhook/convox_trial",
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                user_id: userId,
+                session_id: sessionId,
+                timestamp: new Date().toLocaleString("en-GB"),
+                user_message: message,
+              }),
+            }
+          );
+
+          const data = await res.json();
+          hideTyping();
+
+          const botReply =
+            Array.isArray(data) && data.length > 0
+              ? data[data.length - 1].response
+              : "Sorry, something went wrong.";
+          appendMessage("bot", botReply);
+        } catch (err) {
+          hideTyping();
+          appendMessage("bot", "Error contacting server.");
+          console.error(err);
+        }
+      }
+    </script>
+  </body>
+</html>
   `);
 };
