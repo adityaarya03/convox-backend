@@ -28,14 +28,14 @@ export const generateScript = (req, res) => {
 };
 
 export const widgetScript = (req, res) => {
-  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth } = req.body;
+  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth } =
+    req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
   // const iframeUrl = `https://convo-x-signup.vercel.app/chat-widget?user_id=${user_id}&primaryColor=${primaryColor}&secondaryColor=${secondaryColor}&fontFamily=${fontFamily}`;
 
-
   const sanitizedPrimary = (primaryColor || "").trim() || "#0675E6";
-  const sanitizedSecondary = (secondaryColor || "").trim() || "#e6f0ff";
+  const sanitizedSecondary = (secondaryColor || "").trim() || "#FFFFFF";
   const sanitizedFont = (fontFamily || "").trim() || "Poppins, sans-serif";
   const sanitizedWidth = (widgetWidth || "").trim() || "350px";
 
@@ -98,7 +98,8 @@ export const widgetScript = (req, res) => {
     <!-- Chat Box -->
     <div
       id="chatBox"
-      class="fixed bottom-[90px] right-3 w-[90%] sm:w-[370px] h-[70vh] rounded-2xl overflow-hidden bg-white flex flex-col shadow-lg z-[998]"
+      class="fixed bottom-[90px] right-3 w-[90%] sm:w-[370px] h-[70vh] rounded-2xl overflow-hidden flex flex-col shadow-lg z-[998]"
+      style="background-color: ${sanitizedSecondary}"
     >
       <div
         class="h-16 text-white flex flex-col justify-center px-6"
@@ -116,13 +117,14 @@ export const widgetScript = (req, res) => {
       ></div>
 
       <div
-        class="flex gap-2 items-center p-2 bg-white border-t border-gray-300"
+        class="flex gap-2 items-center p-2 border-t border-gray-300"
+        style="background-color: ${sanitizedSecondary}"
       >
         <textarea
           id="chatInput"
           placeholder="How can we help you today..."
           rows="1"
-          class="flex-1 px-3 py-2 text-sm focus:outline-none resize-none overflow-y-auto"
+          class="flex-1 bg-transparent px-3 py-2 text-sm focus:outline-none resize-none overflow-y-auto"
           oninput="adjustHeight(this)"
           onkeydown="if(event.key === 'Enter' && !event.shiftKey){ event.preventDefault(); sendMessage(); }"
         ></textarea>
