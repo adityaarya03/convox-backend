@@ -1,15 +1,25 @@
 export const generateScript = (req, res) => {
-  const { user_id, primaryColor, secondaryColor, fontFamily } = req.body;
-
-  if (!user_id || !primaryColor || !secondaryColor || !fontFamily) {
-    return res.status(400).json({ error: "All fields are required" });
-  }
-
-  const encodedParams = new URLSearchParams({
+  const {
     user_id,
     primaryColor,
     secondaryColor,
     fontFamily,
+    widgetWidth,
+    companionName,
+  } = req.body;
+
+  const sanitizedPrimary = (primaryColor || "").trim() || "#0675E6";
+  const sanitizedSecondary = (secondaryColor || "").trim() || "#FFFFFF";
+  const sanitizedFont = (fontFamily || "").trim() || "Poppins, sans-serif";
+  const sanitizedWidth = (widgetWidth || "").trim() || "350px";
+
+  const encodedParams = new URLSearchParams({
+    user_id,
+    sanitizedPrimary,
+    sanitizedSecondary,
+    sanitizedFont,
+    sanitizedWidth,
+    companionName
   }).toString();
 
   const widgetURL = `https://convo-x-signup.vercel.app/chat-widget?${encodedParams}`;
@@ -28,8 +38,14 @@ export const generateScript = (req, res) => {
 };
 
 export const widgetScript = (req, res) => {
-  const { user_id, primaryColor, secondaryColor, fontFamily, widgetWidth, companionName } =
-    req.body;
+  const {
+    user_id,
+    primaryColor,
+    secondaryColor,
+    fontFamily,
+    widgetWidth,
+    companionName,
+  } = req.body;
 
   const encodedUserId = encodeURIComponent(user_id || "");
   console.log(req.body);
