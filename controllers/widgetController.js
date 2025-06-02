@@ -11,31 +11,46 @@ export const generateScript = (req, res) => {
   const sanitizedPrimary = (primaryColor || "").trim() || "#0675E6";
   const sanitizedSecondary = (secondaryColor || "").trim() || "#FFFFFF";
   const sanitizedFont = (fontFamily || "").trim() || "Poppins, sans-serif";
-  const sanitizedWidth = (widgetWidth || "").trim() || "350px";
+  const sanitizedWidth = (widgetWidth || "").trim(); // optional
+  const sanitizedName = (companionName || "").trim() || "Companion";
 
-  const encodedParams = new URLSearchParams({
+  const query = new URLSearchParams({
     user_id,
-    sanitizedPrimary,
-    sanitizedSecondary,
-    sanitizedFont,
-    sanitizedWidth,
-    companionName
+    primaryColor: sanitizedPrimary,
+    secondaryColor: sanitizedSecondary,
+    fontFamily: sanitizedFont,
+    widgetWidth: sanitizedWidth,
+    companionName: sanitizedName
   }).toString();
 
-  const widgetURL = `https://convo-x-signup.vercel.app/chat-widget?${encodedParams}`;
+  const widgetURL = `https://convo-x-signup.vercel.app/chat-widget?${query}`;
 
   const scriptTag = `
 <script>
   (function() {
+    const wrapper = document.createElement('div');
+    wrapper.style.position = 'fixed';
+    wrapper.style.bottom = '20px';
+    wrapper.style.right = '20px';
+    wrapper.style.width = '100%';
+    wrapper.style.aspectRatio = '1 / 1.5';
+    wrapper.style.zIndex = '9999';
+    wrapper.style.height = '100%';
+
     const iframe = document.createElement('iframe');
     iframe.src = "${widgetURL}";
-    iframe.style = "border: none; width: 400px; height: 600px; position: fixed; bottom: 20px; right: 20px; z-index: 9999;";
-    document.body.appendChild(iframe);
+    iframe.style.border = 'none';
+    iframe.style.width = '100%';
+    iframe.style.height = '100%';
+
+    wrapper.appendChild(iframe);
+    document.body.appendChild(wrapper);
   })();
 </script>`.trim();
 
   res.status(200).send(scriptTag);
 };
+
 
 export const widgetScript = (req, res) => {
   const {
